@@ -29,7 +29,10 @@ def read_thresholding():
     return threshold
 
 <<<<<<< HEAD:predict.py
+<<<<<<< HEAD:predict.py
 =======
+=======
+>>>>>>> 1a0edebce622e9594af96c685b6c4b1e349b6777:script_filtered_pos_score.py
 
 >>>>>>> 8482fc5 (submit for testing 2):script_filtered_pos_score.py
 class contig:
@@ -274,6 +277,7 @@ def predict(filepath,
 if __name__ == "__main__":
 
 <<<<<<< HEAD:predict.py
+<<<<<<< HEAD:predict.py
      filepath = "test/"
      filename1 = "test.faa"
      filename2 = "hmmer_search"
@@ -285,6 +289,8 @@ if __name__ == "__main__":
              filename3,
              filename4)
 =======
+=======
+>>>>>>> 1a0edebce622e9594af96c685b6c4b1e349b6777:script_filtered_pos_score.py
     args = virbot_cmd()
 
     temp_dir = args.temp_dir
@@ -314,4 +320,7 @@ if __name__ == "__main__":
             filename2="hmmer_search",
             filename3=args.input,
             filename4=args.output)
+<<<<<<< HEAD:predict.py
 >>>>>>> 8482fc5 (submit for testing 2):script_filtered_pos_score.py
+=======
+>>>>>>> 1a0edebce622e9594af96c685b6c4b1e349b6777:script_filtered_pos_score.py

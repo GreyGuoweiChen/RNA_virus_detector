@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # RNA_virus_detector  
 This is an RNA virus identification tool. Currently in preparation.  
 
@@ -22,6 +23,8 @@ This is an RNA virus identification tool. Currently in preparation.
     hmmsearch --tblout hmmer_search --noali -E 0.001 --cpu 112 ../ref/RNA_virus.hmm test.faa  
     python3 predict.py  
 =======
+=======
+>>>>>>> 1a0edebce622e9594af96c685b6c4b1e349b6777
 # VirBot: a protein-based RNA virus detector for metagenomic data
 VirBot is an RNA virus detection tool, which allows accurate and sensitive identificaton for RNA viral contigs. Currently still in development, feel free to use and welcome any suggestions.  
 
@@ -62,5 +65,8 @@ python predict.py [--input INPUT_CONTIG] [--output PREDICTION] [--temp_dir TEMPO
   ### Example:  
 ```
 python predict.py --input test/test.fa --output test_results.fna
+<<<<<<< HEAD
 >>>>>>> 8482fc5 (submit for testing 2)
+=======
+>>>>>>> 1a0edebce622e9594af96c685b6c4b1e349b6777
 ```
