@@ -1,25 +1,32 @@
-
+import argparse
 import subprocess
 from collections import Counter
+import os
 global positive_cluster
 positive_cluster = []
 
+
+# argument parser
+def virbot_cmd():
+    parser = argparse.ArgumentParser(description="ARGUMENTS")
+
+    parser.add_argument('--input', type=str, help="The input contig file.")
+    parser.add_argument('--output', type=str, help="The output file containing all the predicted RNA virus contigs.")
+    parser.add_argument('--temp_dir', default="temp", type=str, help="The temporary directory used to hold temporary files")
+    
+    args = parser.parse_args()
+
+    return args
+
+
 def read_thresholding():
-    filename = "data/RNA_virus_4/thresholding_adaptive_T1_neg.txt"
+    filename = "ref/hmm_threshold.txt"
     threshold = {}
     with open(filename, 'r') as f:
         for line in f:
             t = line.strip().split()
             threshold[int(t[0])] = float(t[1])
     return threshold
-
-def read_rv_acc():
-    filename = "data/RNA_virus_4/sequence_all_acc.txt"
-    db_rc_acc = set()
-    with open(filename, 'r') as f:
-        for line in f:
-            db_rc_acc.add(line.strip())
-    return db_rc_acc
 
 
 class contig:
@@ -41,11 +48,12 @@ class contig:
                 t += 1
         if len(self.proteins):
             self.rnaviralness = t / len(self.proteins)
+
+
 #####################################################################################
 class protein:
 
     db_threshold = read_thresholding()
-    db_rv_acc = read_rv_acc()
 
     def __init__(self,fullname):
         self.fullname = fullname
@@ -103,7 +111,7 @@ class protein:
 #####################################################################################
 def predict(filepath,
             filename1, filename2, filename3,
-            filename4, filename5, prot_pred=False):
+            filename4, prot_pred=False):
     """
 
     :param filename1: proteins file for contigs need to be predicted
@@ -241,124 +249,53 @@ def predict(filepath,
     # add hmmsearch module for prot
 
     # parse the match result for all proteins
-    # proteins = parse_hmmsearch(filepath + filename2, proteins)
-    # print("parsing of protein HMM-match result finished")
+    proteins = parse_hmmsearch(filepath + filename2, proteins)
+    print("parsing of protein HMM-match result finished")
 
-    proteins = parse_diamond_blastx(filepath + filename5, proteins)
-    print("parsing of protein DIAMOND-match result finished")
+#    proteins = parse_diamond_blastx(filepath + filename5, proteins)
+#    print("parsing of protein DIAMOND-match result finished")
 
     #统计hmmscan结果，并统计到contig里面去。
-    contigs = parse_contig(filepath + filename3, proteins)
+    # contigs = parse_contig(filepath + filename3, proteins)
+    contigs = parse_contig(filename3, proteins)
 
     #对每条contig进行评分，返回包含seq 的 positive contigs
-    positive_contigs = output_rnaviralness(filepath + filename3,contigs)
+    # positive_contigs = output_rnaviralness(filepath + filename3,contigs)
+    positive_contigs = output_rnaviralness(filename3,contigs)
 
     #所有postitive contig写文件
-    write_positive_file(filepath + filename4,positive_contigs)
+    # write_positive_file(filepath + filename4,positive_contigs)
+    write_positive_file(filename4,positive_contigs)
 
 #####################################################################################
 if __name__ == "__main__":
 
-    # filepath = "data/other/SPAV1/"
-    # filename1 = "contigs_500.faa"
-    # filename2 = "tbl4/tbl_search_contig_500"
-    # filename3 = "contigs_500.fasta"
-    # filename4 = "tbl4/pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
+    args = virbot_cmd()
 
-    # filepath = "data/other/Salmon_meta/"
-    # filename1 = "contigs_1000.faa"
-    # filename2 = "tbl4/tbl_report_non_salmon_nr"
-    # filename3 = "tbl4/non_salmon_1000.contigs.fa"
-    # filename4 = "pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
+    temp_dir = args.temp_dir
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+    
+    # filename1 = "test.faa"
+    # filename2 = "hmmer_search"
+    # filename3 = "test.fa"
+    # filename4 = "pos_contigs.vb.fasta"
 
-    # filepath = "data/other/PRJNA605028/"
-    # filename1 = "contigsPRJNA605028_RNA.over500.faa"
-    # filename2 = "tbl4/tbl_search_PRJNA_500"
-    # filename3 = "contigsPRJNA605028_RNA.over500.fasta"
-    # filename4 = "tbl4/PRJNA_500.rvd.fasta"
-    # filename5 = "tbl4/pos_contig_500.diamond.rvd.out"
-    # F = False
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         filename5,
-    #         prot_pred = False)
+    FNULL = open(os.devnull, 'w')
+    
+    # run prodigal
+    print("Predicting the encoded proteins...")
+    subprocess.run(f"prodigal -i {args.input} -a {temp_dir}/test.faa -p meta", shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    print("Proteins prediction finished.")
 
-    # filepath = "data/other/marine_virus/"
-    # filename1 = "contigs_1000.faa"
-    # filename2 = "tbl4/tbl_search_marine_1000"
-    # filename3 = "tbl4/contigsMarine.over1000.fasta"
-    # filename4 = "pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
+    # run hmmer
+    print("Scanning the protein by hmmsearch...")
+    subprocess.run(f"hmmsearch --tblout {temp_dir}/hmmer_search --noali -E 0.001 --cpu 112 ref/RNA_virus.hmm {temp_dir}/test.faa", shell=True, stdout=FNULL)
+    print("Scanning finshed.")
 
-    ERR_num = 4
-    filepath = "data/other/ERR%d/"%(ERR_num)
-    filename1 = "ERR%d_500.contig.faa"%(ERR_num)
-    filename2 = "tbl4/tbl_search_ERR%d_500"%(ERR_num)
-    filename3 = "ERR%d_500.contig.fasta"%(ERR_num)
-    filename4 = "tbl4/ERR%d_500.rvd.fasta"%(ERR_num)
-    filename5 = "tbl4/ERR%d_500_hit.diamond.rvd.out"%(ERR_num)
-    predict(filepath,
-            filename1,
-            filename2,
-            filename3,
-            filename4,
-            filename5,
-            prot_pred = False)
-
-    # filepath = "data/other/aay5981_data_s2/ssRNAphage_sequences/allNew/"
-    # filename1 = "allNew_all.faa"
-    # filename2 = "tbl4/tbl_search_allNew_500"
-    # filename3 = "allNew_500.fasta"
-    # filename4 = "tbl4/allNew_500.rvd.fasta"
-    # filename5 = "tbl4/pos_contig_500.diamond.rvd.out"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         filename5,
-    #         prot_pred = False)
-
-    # filepath = "data/other/gut_virome/"
-    # filename1 = "final_500.contigs.faa"
-    # filename2 = "tbl/tbl_search_500"
-    # filename3 = "final.contigs.fasta"
-    # filename4 = "tbl/pos_contig_500.rvd.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
-
-    # filepath = "data/other/human_CYRN/"
-    # filename1 = "spades/spades_500.faa"
-    # filename2 = "tbl4/tbl_report_human_spades"
-    # filename3 = "spades/spades_500.fasta"
-    # filename4 = "spades/pos_contig_spades_500.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
+    # predict using VirBot
+    predict(filepath=f"{temp_dir}/",
+            filename1=f"test.faa",
+            filename2="hmmer_search",
+            filename3=args.input,
+            filename4=args.output)
