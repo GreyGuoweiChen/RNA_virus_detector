@@ -8,7 +8,7 @@ This is an RNA virus identification tool. Currently in preparation.
     
 ## Usage:
   The predict.py does not accept any command line input now. For testing, please modify the file path at the end of the code    
- >   filepath : your data work space(test)  
+ >   filepath : your data work space(Ex: test)  
  >   filename1 : the contigs file name (Ex: test.fa)  
  >   filename2 : the hmmer search result (Ex: hmmer_search)  
  >   filename3 : the predicted proteins file name (Ex: test.faa)  
