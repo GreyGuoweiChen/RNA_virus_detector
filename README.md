@@ -2,11 +2,8 @@
 This is an RNA virus identification tool. Currently in preparation.  
 
 Dependency. 
-
-  Prodigal
-  
+  Prodigal。
   Hmmer. 
-  
   python3. 
     
 Usage:  
