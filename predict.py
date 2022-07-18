@@ -1,8 +1,23 @@
-
+import argparse
 import subprocess
 from collections import Counter
+import os
 global positive_cluster
 positive_cluster = []
+
+
+# argument parser
+def virbot_cmd():
+    parser = argparse.ArgumentParser(description="ARGUMENTS")
+
+    parser.add_argument('--input', type=str, help="The input contig file.")
+    parser.add_argument('--output', type=str, help="The output file containing all the predicted RNA virus contigs.")
+    parser.add_argument('--temp_dir', default="temp", type=str, help="The temporary directory used to hold temporary files")
+    
+    args = parser.parse_args()
+
+    return args
+
 
 def read_thresholding():
     filename = "ref/hmm_threshold.txt"
@@ -13,6 +28,10 @@ def read_thresholding():
             threshold[int(t[0])] = float(t[1])
     return threshold
 
+<<<<<<< HEAD:predict.py
+=======
+
+>>>>>>> 8482fc5 (submit for testing 2):script_filtered_pos_score.py
 class contig:
     def __init__(self,fullname):
         self.fullname = fullname
@@ -32,6 +51,8 @@ class contig:
                 t += 1
         if len(self.proteins):
             self.rnaviralness = t / len(self.proteins)
+
+
 #####################################################################################
 class protein:
 
@@ -238,17 +259,21 @@ def predict(filepath,
 #    print("parsing of protein DIAMOND-match result finished")
 
     #统计hmmscan结果，并统计到contig里面去。
-    contigs = parse_contig(filepath + filename3, proteins)
+    # contigs = parse_contig(filepath + filename3, proteins)
+    contigs = parse_contig(filename3, proteins)
 
     #对每条contig进行评分，返回包含seq 的 positive contigs
-    positive_contigs = output_rnaviralness(filepath + filename3,contigs)
+    # positive_contigs = output_rnaviralness(filepath + filename3,contigs)
+    positive_contigs = output_rnaviralness(filename3,contigs)
 
     #所有postitive contig写文件
-    write_positive_file(filepath + filename4,positive_contigs)
+    # write_positive_file(filepath + filename4,positive_contigs)
+    write_positive_file(filename4,positive_contigs)
 
 #####################################################################################
 if __name__ == "__main__":
 
+<<<<<<< HEAD:predict.py
      filepath = "test/"
      filename1 = "test.faa"
      filename2 = "hmmer_search"
@@ -259,3 +284,34 @@ if __name__ == "__main__":
              filename2,
              filename3,
              filename4)
+=======
+    args = virbot_cmd()
+
+    temp_dir = args.temp_dir
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+    
+    # filename1 = "test.faa"
+    # filename2 = "hmmer_search"
+    # filename3 = "test.fa"
+    # filename4 = "pos_contigs.vb.fasta"
+
+    FNULL = open(os.devnull, 'w')
+    
+    # run prodigal
+    print("Predicting the encoded proteins...")
+    subprocess.run(f"prodigal -i {args.input} -a {temp_dir}/test.faa -p meta", shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+    print("Proteins prediction finished.")
+
+    # run hmmer
+    print("Scanning the protein by hmmsearch...")
+    subprocess.run(f"hmmsearch --tblout {temp_dir}/hmmer_search --noali -E 0.001 --cpu 112 ref/RNA_virus.hmm {temp_dir}/test.faa", shell=True, stdout=FNULL)
+    print("Scanning finshed.")
+
+    # predict using VirBot
+    predict(filepath=f"{temp_dir}/",
+            filename1=f"test.faa",
+            filename2="hmmer_search",
+            filename3=args.input,
+            filename4=args.output)
+>>>>>>> 8482fc5 (submit for testing 2):script_filtered_pos_score.py
