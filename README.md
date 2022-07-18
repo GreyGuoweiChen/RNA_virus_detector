@@ -16,8 +16,8 @@ Usage:
     
   For testing:  
 ```
-    cd test. 
-    prodigal -p meta -i test.fa -a test.faa. 
-    hmmsearch --tblout hmmer_search --noali -E 0.001 --cpu 112 ../ref/RNA_virus.hmm test.faa. 
-    python3 predict.py. 
+    cd test  
+    prodigal -p meta -i test.fa -a test.faa  
+    hmmsearch --tblout hmmer_search --noali -E 0.001 --cpu 112 ../ref/RNA_virus.hmm test.faa  
+    python3 predict.py  
 ```
