@@ -5,22 +5,13 @@ global positive_cluster
 positive_cluster = []
 
 def read_thresholding():
-    filename = "data/RNA_virus_4/thresholding_adaptive_T1_neg.txt"
+    filename = "ref/hmm_threshold.txt"
     threshold = {}
     with open(filename, 'r') as f:
         for line in f:
             t = line.strip().split()
             threshold[int(t[0])] = float(t[1])
     return threshold
-
-def read_rv_acc():
-    filename = "data/RNA_virus_4/sequence_all_acc.txt"
-    db_rc_acc = set()
-    with open(filename, 'r') as f:
-        for line in f:
-            db_rc_acc.add(line.strip())
-    return db_rc_acc
-
 
 class contig:
     def __init__(self,fullname):
@@ -45,7 +36,6 @@ class contig:
 class protein:
 
     db_threshold = read_thresholding()
-    db_rv_acc = read_rv_acc()
 
     def __init__(self,fullname):
         self.fullname = fullname
@@ -103,7 +93,7 @@ class protein:
 #####################################################################################
 def predict(filepath,
             filename1, filename2, filename3,
-            filename4, filename5, prot_pred=False):
+            filename4, prot_pred=False):
     """
 
     :param filename1: proteins file for contigs need to be predicted
@@ -241,11 +231,11 @@ def predict(filepath,
     # add hmmsearch module for prot
 
     # parse the match result for all proteins
-    # proteins = parse_hmmsearch(filepath + filename2, proteins)
-    # print("parsing of protein HMM-match result finished")
+    proteins = parse_hmmsearch(filepath + filename2, proteins)
+    print("parsing of protein HMM-match result finished")
 
-    proteins = parse_diamond_blastx(filepath + filename5, proteins)
-    print("parsing of protein DIAMOND-match result finished")
+#    proteins = parse_diamond_blastx(filepath + filename5, proteins)
+#    print("parsing of protein DIAMOND-match result finished")
 
     #统计hmmscan结果，并统计到contig里面去。
     contigs = parse_contig(filepath + filename3, proteins)
@@ -259,106 +249,13 @@ def predict(filepath,
 #####################################################################################
 if __name__ == "__main__":
 
-    # filepath = "data/other/SPAV1/"
-    # filename1 = "contigs_500.faa"
-    # filename2 = "tbl4/tbl_search_contig_500"
-    # filename3 = "contigs_500.fasta"
-    # filename4 = "tbl4/pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
-
-    # filepath = "data/other/Salmon_meta/"
-    # filename1 = "contigs_1000.faa"
-    # filename2 = "tbl4/tbl_report_non_salmon_nr"
-    # filename3 = "tbl4/non_salmon_1000.contigs.fa"
-    # filename4 = "pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
-
-    # filepath = "data/other/PRJNA605028/"
-    # filename1 = "contigsPRJNA605028_RNA.over500.faa"
-    # filename2 = "tbl4/tbl_search_PRJNA_500"
-    # filename3 = "contigsPRJNA605028_RNA.over500.fasta"
-    # filename4 = "tbl4/PRJNA_500.rvd.fasta"
-    # filename5 = "tbl4/pos_contig_500.diamond.rvd.out"
-    # F = False
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         filename5,
-    #         prot_pred = False)
-
-    # filepath = "data/other/marine_virus/"
-    # filename1 = "contigs_1000.faa"
-    # filename2 = "tbl4/tbl_search_marine_1000"
-    # filename3 = "tbl4/contigsMarine.over1000.fasta"
-    # filename4 = "pos_contig.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
-
-    ERR_num = 4
-    filepath = "data/other/ERR%d/"%(ERR_num)
-    filename1 = "ERR%d_500.contig.faa"%(ERR_num)
-    filename2 = "tbl4/tbl_search_ERR%d_500"%(ERR_num)
-    filename3 = "ERR%d_500.contig.fasta"%(ERR_num)
-    filename4 = "tbl4/ERR%d_500.rvd.fasta"%(ERR_num)
-    filename5 = "tbl4/ERR%d_500_hit.diamond.rvd.out"%(ERR_num)
-    predict(filepath,
-            filename1,
-            filename2,
-            filename3,
-            filename4,
-            filename5,
-            prot_pred = False)
-
-    # filepath = "data/other/aay5981_data_s2/ssRNAphage_sequences/allNew/"
-    # filename1 = "allNew_all.faa"
-    # filename2 = "tbl4/tbl_search_allNew_500"
-    # filename3 = "allNew_500.fasta"
-    # filename4 = "tbl4/allNew_500.rvd.fasta"
-    # filename5 = "tbl4/pos_contig_500.diamond.rvd.out"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         filename5,
-    #         prot_pred = False)
-
-    # filepath = "data/other/gut_virome/"
-    # filename1 = "final_500.contigs.faa"
-    # filename2 = "tbl/tbl_search_500"
-    # filename3 = "final.contigs.fasta"
-    # filename4 = "tbl/pos_contig_500.rvd.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
-
-    # filepath = "data/other/human_CYRN/"
-    # filename1 = "spades/spades_500.faa"
-    # filename2 = "tbl4/tbl_report_human_spades"
-    # filename3 = "spades/spades_500.fasta"
-    # filename4 = "spades/pos_contig_spades_500.fasta"
-    # predict(filepath,
-    #         filename1,
-    #         filename2,
-    #         filename3,
-    #         filename4,
-    #         prot_pred = False)
+     filepath = "test/"
+     filename1 = "test.faa"
+     filename2 = "hmmer_search"
+     filename3 = "test.fa"
+     filename4 = "pos_contigs.vb.fasta"
+     predict(filepath,
+             filename1,
+             filename2,
+             filename3,
+             filename4)
