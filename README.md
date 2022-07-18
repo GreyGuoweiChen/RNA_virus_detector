@@ -1,4 +1,4 @@
-# RNA_virus_detector. 
+# RNA_virus_detector  
 This is an RNA virus identification tool. Currently in preparation.  
 
 Dependency. 
