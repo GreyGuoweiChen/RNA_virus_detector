@@ -1,5 +1,5 @@
 # VirBot: a protein-based RNA virus detector for metagenomic data
-VirBot is an RNA virus detection tool, which allows accurate and sensitive identificaton for RNA viral contigs. Currently still in development, feel free to use and welcome any suggestions.  
+VirBot is an RNA virus detection tool, which allows accurate and sensitive identificaton for RNA viral contigs. Currently we are still optimizating the codes. But this version is ready to test/use and we welcome any suggestions.
 
 ## Dependency:
 * Prodigal
